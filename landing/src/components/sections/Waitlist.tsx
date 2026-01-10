@@ -67,13 +67,13 @@ const Waitlist: React.FC = () => {
 
       setSubmitted(true);
       toast.success('You have been added to the waitlist!');
-      
+
       setEmail('');
       setName('');
       setOrganization('');
       setRole('');
       setSuggestions('');
-      
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);
@@ -88,7 +88,7 @@ const Waitlist: React.FC = () => {
       {/* Background decoration */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 blur-3xl" />
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-full blur-3xl" />
-      
+
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-4xl mx-auto">
           {/* Gradient border container */}
@@ -259,31 +259,70 @@ const Waitlist: React.FC = () => {
                   </div>
 
                   <div className="flex flex-col items-center space-y-4 pt-4">
-                    <div className="relative group">
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-xl blur-lg opacity-75 group-hover:opacity-100 transition-opacity duration-300" />
-                      <button
-                        type="submit"
-                        disabled={submitting}
-                        className="relative w-full md:w-auto bg-gradient-to-r from-black via-green-500 to-black hover:from-black hover:via-green-400 hover:to-black text-white font-bold py-4 px-8 rounded-xl flex items-center justify-center gap-3 min-w-[250px] transition-all duration-500 ease-in-out transform hover:scale-105 hover:shadow-2xl hover:shadow-green-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg active:scale-95"
-                      >
-                        {submitting ? (
-                          <>
-                            <motion.div
-                              animate={{ rotate: 360 }}
-                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                            />
-                            <span>Joining Waitlist...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Send size={20} />
-                            <span>Join Waitlist</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                    
+                    {/* Enhanced Button with Premium Design */}
+                    <motion.div
+                      className="relative group w-full md:w-auto"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {/* Animated gradient border */}
+                      <div className="absolute -inset-0.5 bg-gradient-to-r from-primary via-secondary to-primary rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-300 group-hover:duration-200 animate-gradient-xy" />
+
+                      {/* Glow effect on hover */}
+                      <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-secondary/50 rounded-xl blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-500" />
+
+                      {/* Button container with glassmorphism */}
+                      <div className="relative">
+                        <button
+                          type="submit"
+                          disabled={submitting}
+                          className="relative w-full md:w-auto bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] hover:bg-right-bottom text-white font-bold py-4 px-10 rounded-xl flex items-center justify-center gap-3 min-w-[280px] transition-all duration-500 ease-out shadow-2xl shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:grayscale overflow-hidden group/btn"
+                        >
+                          {/* Shimmer effect overlay */}
+                          <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+                          {/* Glass reflection effect */}
+                          <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+
+                          {/* Button content */}
+                          <div className="relative flex items-center gap-3">
+                            {submitting ? (
+                              <>
+                                <motion.div
+                                  animate={{ rotate: 360 }}
+                                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                  className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                                />
+                                <span className="text-base tracking-wide">Joining Waitlist...</span>
+                              </>
+                            ) : (
+                              <>
+                                <motion.div
+                                  whileHover={{ x: 3 }}
+                                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                                >
+                                  <Send size={20} className="drop-shadow-lg" />
+                                </motion.div>
+                                <span className="text-base tracking-wide font-semibold">Join Waitlist</span>
+                                <motion.div
+                                  className="opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 ml-1"
+                                  initial={{ scale: 0.8 }}
+                                  whileHover={{ scale: 1 }}
+                                >
+                                  <Sparkles size={16} className="text-white/80" />
+                                </motion.div>
+                              </>
+                            )}
+                          </div>
+
+                          {/* Ripple effect container */}
+                          <span className="absolute inset-0 rounded-xl overflow-hidden">
+                            <span className="absolute inset-0 rounded-xl bg-white/20 scale-0 group-active/btn:scale-100 transition-transform duration-500 ease-out" />
+                          </span>
+                        </button>
+                      </div>
+                    </motion.div>
+
                     <div className="text-center space-y-2">
                       <p className="text-sm text-gray-400">
                         🚀 We'll notify you when early access becomes available
