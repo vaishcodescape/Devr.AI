@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X} from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
     const isHomePage = location.pathname === '/';
 
     useEffect(() => {
@@ -19,6 +20,75 @@ const Navbar: React.FC = () => {
             window.removeEventListener('scroll', handleScroll);
         };
     }, []);
+
+    // Handle smooth scroll on page load with hash
+    useEffect(() => {
+        if (isHomePage && location.hash) {
+            const hash = location.hash.substring(1); // Remove the # symbol
+            setTimeout(() => {
+                const element = document.getElementById(hash);
+                if (element) {
+                    const offset = 80; // Account for fixed navbar height
+                    const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+                    const offsetPosition = elementPosition - offset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 100);
+        }
+    }, [location.hash, isHomePage]);
+
+    // Smooth scroll handler
+    const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+        e.preventDefault();
+        
+        // Close mobile menu if open
+        setIsOpen(false);
+
+        // Extract hash from href
+        const hash = href.includes('#') ? href.split('#')[1] : null;
+        
+        if (!hash) {
+            // If no hash, just navigate normally
+            navigate(href);
+            return;
+        }
+
+        if (isHomePage) {
+            // If we're on the home page, scroll to the element
+            const element = document.getElementById(hash);
+            if (element) {
+                const offset = 80; // Account for fixed navbar height
+                const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+                const offsetPosition = elementPosition - offset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        } else {
+            // If we're on a different page, navigate to home first, then scroll
+            navigate('/');
+            // Wait for navigation to complete, then scroll
+            setTimeout(() => {
+                const element = document.getElementById(hash);
+                if (element) {
+                    const offset = 80;
+                    const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+                    const offsetPosition = elementPosition - offset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 100);
+        }
+    };
 
     const navLinks = [
         { name: 'Features', href: isHomePage ? '#features' : '/#features' },
@@ -39,7 +109,17 @@ const Navbar: React.FC = () => {
                         className="flex items-center"
                     >
                         <Link to="/" className="flex items-center">
-                            <span className="text-2xl font-bold gradient-text">Devr.AI</span>
+                            <span 
+                                className="text-2xl font-bold gradient-text"
+                                style={{
+                                    background: 'linear-gradient(to right, #4ade80, #3b82f6, #22d3ee, #2563eb, #10b981)',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    backgroundClip: 'text',
+                                }}
+                            >
+                                Devr.AI
+                            </span>
                         </Link>
                     </motion.div>
 
@@ -52,6 +132,7 @@ const Navbar: React.FC = () => {
                             <a
                                 key={link.name}
                                 href={link.href}
+                                onClick={(e) => handleSmoothScroll(e, link.href)}
                                 className="text-sm font-medium text-gray-300 transition-colors hover:text-white"
                             >
                                 {link.name}
@@ -59,6 +140,7 @@ const Navbar: React.FC = () => {
                         ))}
                         <a
                             href={isHomePage ? "#waitlist" : "/#waitlist"}
+                            onClick={(e) => handleSmoothScroll(e, isHomePage ? "#waitlist" : "/#waitlist")}
                             className="text-sm font-medium px-4 py-2 rounded-lg bg-primary hover:bg-primary-hover text-white transition-colors"
                         >
                             Join Waitlist
@@ -87,7 +169,7 @@ const Navbar: React.FC = () => {
                         <a
                             key={link.name}
                             href={link.href}
-                            onClick={() => setIsOpen(false)}
+                            onClick={(e) => handleSmoothScroll(e, link.href)}
                             className="block py-3 text-gray-300 hover:text-white"
                         >
                             {link.name}
@@ -95,7 +177,7 @@ const Navbar: React.FC = () => {
                     ))}
                     <a
                         href={isHomePage ? "#waitlist" : "/#waitlist"}
-                        onClick={() => setIsOpen(false)}
+                        onClick={(e) => handleSmoothScroll(e, isHomePage ? "#waitlist" : "/#waitlist")}
                         className="block py-3 text-primary hover:text-primary-hover font-medium"
                     >
                         Join Waitlist
