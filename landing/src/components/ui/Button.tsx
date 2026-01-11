@@ -63,7 +63,7 @@ const Button: React.FC<ButtonProps> = ({
             {/* Background gradient overlay */}
             <span
                 className={`
-          absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-500
+          absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500
           ${variant === 'primary'
                         ? 'bg-gradient-to-br from-green-400 to-green-500'
                         : 'bg-gradient-to-br from-gray-700 to-gray-800'
