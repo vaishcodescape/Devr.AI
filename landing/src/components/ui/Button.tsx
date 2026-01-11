@@ -31,7 +31,7 @@ const Button: React.FC<ButtonProps> = ({
     px-8 py-4 rounded-xl
     font-semibold text-lg
     inline-flex items-center justify-center gap-3
-    transition-all duration-400 ease-out
+    transition-all duration-500 ease-out
     ${fullWidth ? 'w-full' : ''}
     ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
     ${className}
@@ -63,7 +63,7 @@ const Button: React.FC<ButtonProps> = ({
             {/* Background gradient overlay */}
             <span
                 className={`
-          absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-400
+          absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-500
           ${variant === 'primary'
                         ? 'bg-gradient-to-br from-green-400 to-green-500'
                         : 'bg-gradient-to-br from-gray-700 to-gray-800'
@@ -76,7 +76,7 @@ const Button: React.FC<ButtonProps> = ({
                 className={`
           absolute inset-0 -translate-x-full group-hover:translate-x-full
           bg-gradient-to-r from-transparent via-white/20 to-transparent
-          transition-transform duration-600 pointer-events-none
+          transition-transform duration-700 pointer-events-none
         `}
             />
 
@@ -91,11 +91,22 @@ const Button: React.FC<ButtonProps> = ({
 
     const combinedStyles = `${baseStyles} ${variantStyles[variant]}`;
 
+    const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (disabled) {
+            e.preventDefault();
+            return;
+        }
+        onClick?.();
+    };
+
     if (href) {
         return (
             <motion.a
                 href={href}
+                onClick={handleAnchorClick}
                 className={`${combinedStyles} group`}
+                tabIndex={disabled ? -1 : undefined}
+                aria-disabled={disabled}
                 whileHover={!disabled ? { y: -3, scale: 1.02 } : {}}
                 whileTap={!disabled ? { y: -1, scale: 1 } : {}}
             >
