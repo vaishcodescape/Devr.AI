@@ -100,8 +100,8 @@ async def lifespan(app: FastAPI):
     app.state.app_instance = app_instance
     await app_instance.start_background_tasks()
     yield
-    await close_weaviate_client()
     await app_instance.stop_background_tasks()
+    await close_weaviate_client()
 
 
 api = FastAPI(title="Devr.AI API", version="1.0", lifespan=lifespan)

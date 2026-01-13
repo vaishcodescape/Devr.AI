@@ -2,11 +2,13 @@ import weaviate
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 import logging
+import asyncio
 
 logger = logging.getLogger(__name__)
 
 _client = None
 _connected = False
+_connect_lock = asyncio.Lock()
 
 
 def get_client():
@@ -23,9 +25,13 @@ async def ensure_connected():
     client = get_client()
     
     if not _connected or not client.is_connected():
-        await client.connect()
-        _connected = True
-        logger.info("Weaviate client connected")
+        async with _connect_lock:
+             
+            client = get_client()
+            if not _connected or not client.is_connected():
+                await client.connect()
+                _connected = True
+                logger.info("Weaviate client connected")
     
     return client
 
