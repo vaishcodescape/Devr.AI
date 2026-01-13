@@ -6,6 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 _client = None
+_connected = False
 
 
 def get_client():
@@ -15,18 +16,42 @@ def get_client():
         _client = weaviate.use_async_with_local()
     return _client
 
+
+async def ensure_connected():
+    """Ensure the client is connected. Reuses existing connection if available."""
+    global _client, _connected
+    client = get_client()
+    
+    if not _connected or not client.is_connected():
+        await client.connect()
+        _connected = True
+        logger.info("Weaviate client connected")
+    
+    return client
+
+
 @asynccontextmanager
 async def get_weaviate_client() -> AsyncGenerator[weaviate.WeaviateClient, None]:
-    """Async context manager for Weaviate client."""
-    client = get_client()
+    """Async context manager for Weaviate client with persistent connection."""
     try:
-        await client.connect()
+        client = await ensure_connected()
         yield client
     except Exception as e:
-        logger.error(f"Weaviate client error: {str(e)}")
+        logger.error("Weaviate client error: %s", e)
         raise
-    finally:
+
+
+async def close_weaviate_client():
+    """Close the Weaviate client. Call this on application shutdown."""
+    global _client, _connected
+    
+    if _client is not None and _connected:
         try:
-            await client.close()
+            await _client.close()
+            _connected = False
+            logger.info("Weaviate client closed")
         except Exception as e:
-            logger.warning(f"Error closing Weaviate client: {str(e)}")
+            logger.warning("Error closing Weaviate client: %s", e)
+        finally:
+            _client = None
+            _connected = False

@@ -2,6 +2,7 @@ import asyncio
 import logging
 import sys
 from contextlib import asynccontextmanager
+from app.database.weaviate.client import close_weaviate_client
 
 import uvicorn
 from fastapi import FastAPI, Response
@@ -99,6 +100,7 @@ async def lifespan(app: FastAPI):
     app.state.app_instance = app_instance
     await app_instance.start_background_tasks()
     yield
+    await close_weaviate_client()
     await app_instance.stop_background_tasks()
 
 
