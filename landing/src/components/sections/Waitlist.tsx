@@ -7,6 +7,7 @@ import {
     Typography,
     TextField,
     Select,
+    SelectChangeEvent,
     MenuItem,
     FormControl,
     InputLabel,
@@ -26,7 +27,7 @@ const Waitlist: React.FC = () => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [organization, setOrganization] = useState('');
-  const [role, setRole] = useState('');
+  const [role, setRole] = useState<string>('');
   const [suggestions, setSuggestions] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -507,7 +508,7 @@ const Waitlist: React.FC = () => {
                       name="role"
                       labelId="role-label"
                       value={role}
-                      onChange={(e) => setRole(e.target.value)}
+                      onChange={(e: SelectChangeEvent<string>) => setRole(e.target.value)}
                       required
                       MenuProps={{
                         PaperProps: {

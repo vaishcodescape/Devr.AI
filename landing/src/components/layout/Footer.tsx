@@ -15,12 +15,62 @@ import {
     LinkedIn as LinkedInIcon, 
     KeyboardArrowUp as ArrowUpIcon 
 } from '@mui/icons-material';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 
 const Footer: React.FC = () => {
     const currentYear = new Date().getFullYear();
     const location = useLocation();
     const isHomePage = location.pathname === '/';
+
+    const navigate = useNavigate();
+
+    // QuickLink component to handle hash navigation/smooth scroll via router
+    const QuickLink: React.FC<{ link: { label: string; href: string }; isHomePage: boolean }> = ({ link, isHomePage }) => {
+        const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+            e.preventDefault();
+
+            // Construct target href (preserve hash). On non-home pages we prefix with '/'
+            const target = isHomePage ? link.href : `/${link.href}`;
+
+            // Navigate so location.hash updates; scrolling is handled by Navbar's useEffect
+            navigate(target);
+        };
+
+        return (
+            <MuiLink
+                onClick={(e) => handleClick(e)}
+                className="text-gray-400 hover:text-green-400 text-sm transition-colors duration-300 inline-flex items-center gap-2 group"
+                sx={{
+                    color: 'rgba(161, 161, 170, 1)',
+                    fontSize: '0.875rem',
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    position: 'relative',
+                    transition: 'color 0.3s ease',
+                    '&:hover': {
+                        color: 'rgba(34, 197, 94, 1)',
+                    },
+                    '&::before': {
+                        content: '""',
+                        width: 0,
+                        height: '2px',
+                        background: 'linear-gradient(to right, #4ade80, #22d3ee)',
+                        transition: 'width 0.3s ease',
+                        position: 'absolute',
+                        left: 0,
+                        bottom: '-2px',
+                    },
+                    '&:hover::before': {
+                        width: '16px',
+                    },
+                }}
+            >
+                {link.label}
+            </MuiLink>
+        );
+    };
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -203,7 +253,7 @@ const Footer: React.FC = () => {
                                                 component="a"
                                                 href={social.href}
                                                 target="_blank"
-                                                rel="noreferrer"
+                                                rel="noopener noreferrer"
                                                 aria-label={social.label}
                                                 className={`text-gray-400 ${social.color} transition-all duration-300 bg-gray-800/50 hover:bg-gray-800 border border-gray-700 hover:border-gray-600`}
                                                 sx={{
@@ -246,39 +296,11 @@ const Footer: React.FC = () => {
                                 </Typography>
                                 <Stack spacing={1.5}>
                                     {quickLinks.map((link) => (
-                                        <MuiLink
+                                        <QuickLink
                                             key={link.label}
-                                            href={isHomePage ? link.href : `/${link.href}`}
-                                            className="text-gray-400 hover:text-green-400 text-sm transition-colors duration-300 inline-flex items-center gap-2 group"
-                                            sx={{
-                                                color: 'rgba(161, 161, 170, 1)',
-                                                fontSize: '0.875rem',
-                                                textDecoration: 'none',
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                gap: '8px',
-                                                position: 'relative',
-                                                transition: 'color 0.3s ease',
-                                                '&:hover': {
-                                                    color: 'rgba(34, 197, 94, 1)',
-                                                },
-                                                '&::before': {
-                                                    content: '""',
-                                                    width: 0,
-                                                    height: '2px',
-                                                    background: 'linear-gradient(to right, #4ade80, #22d3ee)',
-                                                    transition: 'width 0.3s ease',
-                                                    position: 'absolute',
-                                                    left: 0,
-                                                    bottom: '-2px',
-                                                },
-                                                '&:hover::before': {
-                                                    width: '16px',
-                                                },
-                                            }}
-                                        >
-                                            {link.label}
-                                        </MuiLink>
+                                            link={link}
+                                            isHomePage={isHomePage}
+                                        />
                                     ))}
                                 </Stack>
                             </motion.div>

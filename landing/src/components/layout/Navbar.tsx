@@ -21,11 +21,13 @@ const Navbar: React.FC = () => {
         };
     }, []);
 
-    // Handle smooth scroll on page load with hash
+    // Handle smooth scroll on page load with hash (consolidated and cleaned up)
     useEffect(() => {
+        let timer: ReturnType<typeof setTimeout> | null = null;
+
         if (isHomePage && location.hash) {
             const hash = location.hash.substring(1); // Remove the # symbol
-            setTimeout(() => {
+            timer = setTimeout(() => {
                 const element = document.getElementById(hash);
                 if (element) {
                     const offset = 80; // Account for fixed navbar height
@@ -39,55 +41,21 @@ const Navbar: React.FC = () => {
                 }
             }, 100);
         }
+
+        return () => {
+            if (timer) {
+                clearTimeout(timer);
+            }
+        };
     }, [location.hash, isHomePage]);
 
-    // Smooth scroll handler
+    // Smooth scroll handler - let routing update the hash and useEffect handle scrolling
     const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-        e.preventDefault();
-        
-        // Close mobile menu if open
+        // Do not prevent default navigation; close mobile menu then navigate so location.hash updates
         setIsOpen(false);
 
-        // Extract hash from href
-        const hash = href.includes('#') ? href.split('#')[1] : null;
-        
-        if (!hash) {
-            // If no hash, just navigate normally
-            navigate(href);
-            return;
-        }
-
-        if (isHomePage) {
-            // If we're on the home page, scroll to the element
-            const element = document.getElementById(hash);
-            if (element) {
-                const offset = 80; // Account for fixed navbar height
-                const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-                const offsetPosition = elementPosition - offset;
-
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        } else {
-            // If we're on a different page, navigate to home first, then scroll
-            navigate('/');
-            // Wait for navigation to complete, then scroll
-            setTimeout(() => {
-                const element = document.getElementById(hash);
-                if (element) {
-                    const offset = 80;
-                    const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-                    const offsetPosition = elementPosition - offset;
-
-                    window.scrollTo({
-                        top: offsetPosition,
-                        behavior: 'smooth'
-                    });
-                }
-            }, 100);
-        }
+        // Navigate to the link (includes hash when present). The useEffect above will handle scrolling.
+        navigate(href);
     };
 
     const navLinks = [
