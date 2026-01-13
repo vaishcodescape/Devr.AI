@@ -50,7 +50,8 @@ const Navbar: React.FC = () => {
     }, [location.hash, isHomePage]);
 
     // Smooth scroll handler - let routing update the hash and useEffect handle scrolling
-    const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    const handleSmoothScroll = (e:React.MouseEvent<HTMLAnchorElement>, href: string) => {
+        e.preventDefault();
         // Do not prevent default navigation; close mobile menu then navigate so location.hash updates
         setIsOpen(false);
 

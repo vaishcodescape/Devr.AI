@@ -433,10 +433,6 @@ const Footer: React.FC = () => {
                                     <ArrowUpIcon 
                                         sx={{ 
                                             fontSize: '16px',
-                                            transition: 'transform 0.3s ease',
-                                            '&:hover': {
-                                                transform: 'translateY(-2px)',
-                                            },
                                         }} 
                                     />
                                 </MuiLink>
