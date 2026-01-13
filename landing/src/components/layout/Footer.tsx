@@ -38,6 +38,7 @@ const Footer: React.FC = () => {
 
         return (
             <MuiLink
+                href={link.href}
                 onClick={(e) => handleClick(e)}
                 className="text-gray-400 hover:text-green-400 text-sm transition-colors duration-300 inline-flex items-center gap-2 group"
                 sx={{
