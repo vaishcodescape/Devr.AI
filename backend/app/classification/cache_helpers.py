@@ -179,6 +179,8 @@ async def cached_llm_call(prompt: str, model: str, params: Dict[str, Any], llm):
             start = time.time()
             response = await llm.ainvoke([HumanMessage(content=prompt)])
             elapsed = time.time() - start
+            # log elapsed to avoid unused variable and help with metrics/troubleshooting
+            logger.debug(f"LLM call elapsed for key {key}: {elapsed:.3f}s", extra={"elapsed": elapsed})
             # store response content or small payload rather than full object
             result = response.content if hasattr(response, "content") else response
             _cache[key] = result
@@ -195,8 +197,31 @@ async def cached_llm_call(prompt: str, model: str, params: Dict[str, Any], llm):
             _inflight.pop(key, None)
 
     # schedule owner fetch and await its result
-    loop.create_task(_owner_fetch())
-    return await future
+    owner_task = loop.create_task(_owner_fetch())
+
+    # callback to ensure exceptions from the background task are propagated to waiting callers
+    def _owner_done(task: asyncio.Task) -> None:
+        try:
+            exc = task.exception()
+        except asyncio.CancelledError:
+            # task was cancelled, nothing to propagate here
+            return
+        if exc is not None and not future.done():
+            future.set_exception(exc)
+
+    owner_task.add_done_callback(_owner_done)
+
+    try:
+        return await future
+    except asyncio.CancelledError:
+        # If the awaiting coroutine is cancelled, cancel the owner task and wait for it to finish
+        owner_task.cancel()
+        try:
+            await owner_task
+        except asyncio.CancelledError:
+            # owner_task was cancelled as well; swallow to avoid masking original cancellation
+            pass
+        raise
     
 def normalize_message(msg: str) -> str:
     """Normalize message for caching. Truncates to MAX_MESSAGE_LENGTH to prevent DoS."""
