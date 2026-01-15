@@ -6,13 +6,13 @@ from typing import Optional, Dict, Any
 from cachetools import TTLCache
 from collections import Counter
 from langchain_core.messages import HumanMessage
-import xxhash
 import hashlib
 import json
 
 logger = logging.getLogger(__name__)
 
 try:
+    import xxhash
     _HAS_XXHASH = True
 except Exception:
     xxhash = None
